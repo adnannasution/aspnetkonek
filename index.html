@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Connection String and Code Samples</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .copy-box {
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            position: relative;
+            font-family: monospace;
+            white-space: pre-wrap; /* Membuat teks tetap di baris baru */
+            word-wrap: break-word;
+            margin-bottom: 30px;
+        }
+        .copy-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Code Samples</h1>
+        
+        <!-- Connection String -->
+        <h2>Connection String (appsettings.json)</h2>
+        <div class="copy-box">
+            <button class="btn btn-primary copy-button" onclick="copyToClipboard('connectionString')">Copy</button>
+            <code id="connectionString">
+{
+    "ConnectionStrings": {
+        "DefaultConnection": "Server=YOUR_SERVER;Database=YOUR_DATABASE;User Id=YOUR_USER;Password=YOUR_PASSWORD;"
+    }
+}
+            </code>
+        </div>
+
+        <!-- AppDbContext -->
+        <h2>AppDbContext</h2>
+        <div class="copy-box">
+            <button class="btn btn-primary copy-button" onclick="copyToClipboard('appDbContext')">Copy</button>
+            <code id="appDbContext">
+using Microsoft.EntityFrameworkCore;
+
+namespace YourNamespace.Data
+{
+    public class AppDbContext : DbContext
+    {
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
+        {
+        }
+
+        public DbSet<Product> Products { get; set; }
+    }
+}
+            </code>
+        </div>
+
+        <!-- Controller -->
+        <h2>Controller (HomeController.cs)</h2>
+        <div class="copy-box">
+            <button class="btn btn-primary copy-button" onclick="copyToClipboard('controllerCode')">Copy</button>
+            <code id="controllerCode">
+using Microsoft.AspNetCore.Mvc;
+using YourNamespace.Data;
+
+namespace YourNamespace.Controllers
+{
+    public class HomeController : Controller
+    {
+        private readonly AppDbContext _context;
+
+        public HomeController(AppDbContext context)
+        {
+            _context = context;
+        }
+
+        public IActionResult Index()
+        {
+            var products = _context.Products.ToList();
+            return View(products);
+        }
+    }
+}
+            </code>
+        </div>
+
+        <!-- Program.cs -->
+        <h2>Program.cs</h2>
+        <div class="copy-box">
+            <button class="btn btn-primary copy-button" onclick="copyToClipboard('programCode')">Copy</button>
+            <code id="programCode">
+using Microsoft.EntityFrameworkCore;
+using YourNamespace.Data;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// Add Connection String
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+// Add AppDbContext to DI container
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(connectionString));
+
+var app = builder.Build();
+
+app.UseHttpsRedirection();
+app.UseStaticFiles();
+app.UseRouting();
+app.UseAuthorization();
+
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.Run();
+            </code>
+        </div>
+    </div>
+
+    <script>
+        function copyToClipboard(elementId) {
+            var text = document.getElementById(elementId).innerText.trim();
+            navigator.clipboard.writeText(text).then(function() {
+                alert('Code copied to clipboard!');
+            });
+        }
+    </script>
+</body>
+</html>
