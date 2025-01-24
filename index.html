@@ -272,58 +272,6 @@ namespace Perusahaan.Controllers
 
 
 
-
-
-
-
-         
-        <h2>Index.cshtml</h2>
-        <div class="copy-box">
-            <button class="btn btn-primary copy-button" onclick="copyToClipboard('programCode')">Copy</button>
-            <code id="IndexCode">
-@model IEnumerable<Pegawai>
-
-@{
-    ViewData["Title"] = "Daftar Pegawai";
-}
-
-<h2>@ViewData["Title"]</h2>
-
-<p>
-    <a class="btn btn-primary" asp-action="Create">Tambah Pegawai</a>
-</p>
-
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Id</th>
-            <th>Nama</th>
-            <th>Bagian</th>
-            <th>Jabatan</th>
-            <th>Aksi</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>@item.Id</td>
-                <td>@item.Nama</td>
-                <td>@item.Bagian</td>
-                <td>@item.Jabatan</td>
-                <td>
-                    <a class="btn btn-info btn-sm" asp-action="Details" asp-route-id="@item.Id">Detail</a>
-                    <a class="btn btn-warning btn-sm" asp-action="Edit" asp-route-id="@item.Id">Edit</a>
-                    <a class="btn btn-danger btn-sm" asp-action="Delete" asp-route-id="@item.Id">Hapus</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
-
-
-            </code>
-        </div>
             
 
       
