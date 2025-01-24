@@ -33,10 +33,19 @@
             <button class="btn btn-primary copy-button" onclick="copyToClipboard('connectionString')">Copy</button>
             <code id="connectionString">
 {
-    "ConnectionStrings": {
-        "DefaultConnection": "Server=YOUR_SERVER;Database=YOUR_DATABASE;User Id=YOUR_USER;Password=YOUR_PASSWORD;"
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft": "Warning",
+      "Microsoft.Hosting.Lifetime": "Information"
     }
+  },
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=localhost;Database=DbPegawai;User Id=sa;Password=12345678;TrustServerCertificate=True;"
+  },
+  "AllowedHosts": "*"
 }
+
             </code>
         </div>
 
@@ -46,18 +55,16 @@
             <button class="btn btn-primary copy-button" onclick="copyToClipboard('appDbContext')">Copy</button>
             <code id="appDbContext">
 using Microsoft.EntityFrameworkCore;
+using Perusahaan.Models;
 
-namespace YourNamespace.Data
+
+public class AppDbContext : DbContext
 {
-    public class AppDbContext : DbContext
-    {
-        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
-        {
-        }
+    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
-        public DbSet<Product> Products { get; set; }
-    }
+    public DbSet<Pegawai> Pegawai { get; set; }
 }
+
             </code>
         </div>
 
@@ -66,27 +73,151 @@ namespace YourNamespace.Data
         <div class="copy-box">
             <button class="btn btn-primary copy-button" onclick="copyToClipboard('controllerCode')">Copy</button>
             <code id="controllerCode">
+using Perusahaan.Models;
 using Microsoft.AspNetCore.Mvc;
-using YourNamespace.Data;
+using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
-namespace YourNamespace.Controllers
+namespace Perusahaan.Controllers
 {
-    public class HomeController : Controller
+    public class PegawaiController : Controller
     {
         private readonly AppDbContext _context;
 
-        public HomeController(AppDbContext context)
+        public PegawaiController(AppDbContext context)
         {
             _context = context;
         }
 
-        public IActionResult Index()
+        // Index
+        public async Task<IActionResult> Index()
         {
-            var products = _context.Products.ToList();
-            return View(products);
+            return View(await _context.Pegawai.ToListAsync());
+        }
+
+        // Create (GET)
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+        // Create (POST)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create([Bind("Id,Nama,Bagian,Jabatan")] Pegawai pegawai)
+        {
+            if (ModelState.IsValid)
+            {
+                _context.Add(pegawai);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            return View(pegawai);
+        }
+
+        // Details
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var pegawai = await _context.Pegawai
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (pegawai == null)
+            {
+                return NotFound();
+            }
+
+            return View(pegawai);
+        }
+
+        // Edit (GET)
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var pegawai = await _context.Pegawai.FindAsync(id);
+            if (pegawai == null)
+            {
+                return NotFound();
+            }
+            return View(pegawai);
+        }
+
+        // Edit (POST)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Nama,Bagian,Jabatan")] Pegawai pegawai)
+        {
+            if (id != pegawai.Id)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _context.Update(pegawai);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!PegawaiExists(pegawai.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            return View(pegawai);
+        }
+
+        // Delete (GET)
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var pegawai = await _context.Pegawai
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (pegawai == null)
+            {
+                return NotFound();
+            }
+
+            return View(pegawai);
+        }
+
+        // Delete (POST)
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var pegawai = await _context.Pegawai.FindAsync(id);
+            _context.Pegawai.Remove(pegawai);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+        private bool PegawaiExists(int id)
+        {
+            return _context.Pegawai.Any(e => e.Id == id);
         }
     }
 }
+
             </code>
         </div>
 
@@ -96,22 +227,31 @@ namespace YourNamespace.Controllers
             <button class="btn btn-primary copy-button" onclick="copyToClipboard('programCode')">Copy</button>
             <code id="programCode">
 using Microsoft.EntityFrameworkCore;
-using YourNamespace.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add Connection String
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+// Add services to the container.
+builder.Services.AddControllersWithViews();
 
-// Add AppDbContext to DI container
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(connectionString));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 
 var app = builder.Build();
 
+// Configure the HTTP request pipeline.
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Home/Error");
+    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+    app.UseHsts();
+}
+
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+
 app.UseRouting();
+
 app.UseAuthorization();
 
 app.MapControllerRoute(
@@ -119,6 +259,7 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
+
             </code>
         </div>
     </div>
