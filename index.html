@@ -68,6 +68,53 @@ public class AppDbContext : DbContext
             </code>
         </div>
 
+
+
+
+          <!-- Program.cs -->
+        <h2>Program.cs</h2>
+        <div class="copy-box">
+            <button class="btn btn-primary copy-button" onclick="copyToClipboard('programCode')">Copy</button>
+            <code id="programCode">
+using Microsoft.EntityFrameworkCore;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// Add services to the container.
+builder.Services.AddControllersWithViews();
+
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+
+var app = builder.Build();
+
+// Configure the HTTP request pipeline.
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Home/Error");
+    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+    app.UseHsts();
+}
+
+app.UseHttpsRedirection();
+app.UseStaticFiles();
+
+app.UseRouting();
+
+app.UseAuthorization();
+
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.Run();
+
+            </code>
+        </div>
+
+        
+
         <!-- Controller -->
         <h2>Controller (HomeController.cs)</h2>
         <div class="copy-box">
@@ -221,47 +268,7 @@ namespace Perusahaan.Controllers
             </code>
         </div>
 
-        <!-- Program.cs -->
-        <h2>Program.cs</h2>
-        <div class="copy-box">
-            <button class="btn btn-primary copy-button" onclick="copyToClipboard('programCode')">Copy</button>
-            <code id="programCode">
-using Microsoft.EntityFrameworkCore;
-
-var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
-builder.Services.AddControllersWithViews();
-
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-
-var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
-}
-
-app.UseHttpsRedirection();
-app.UseStaticFiles();
-
-app.UseRouting();
-
-app.UseAuthorization();
-
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
-
-app.Run();
-
-            </code>
-        </div>
+      
     </div>
 
     <script>
