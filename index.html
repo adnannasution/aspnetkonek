@@ -76,6 +76,7 @@ public class AppDbContext : DbContext
         <div class="copy-box">
             <button class="btn btn-primary copy-button" onclick="copyToClipboard('programCode')">Copy</button>
             <code id="programCode">
+
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -83,9 +84,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+//tambahkan appdbcontext di program.cs
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
 
 var app = builder.Build();
 
@@ -109,6 +110,7 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
+
 
             </code>
         </div>
