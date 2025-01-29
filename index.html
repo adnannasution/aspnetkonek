@@ -85,7 +85,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 //tambahkan appdbcontext di program.cs
-builder.Services.AddDbContext<pre>&lt;AppDbContext&gt;</pre>(options =>options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddDbContext&lt;AppDbContext&gt;(options =>options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 
 var app = builder.Build();
