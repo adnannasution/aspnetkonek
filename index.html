@@ -54,9 +54,8 @@
         <div class="copy-box">
             <button class="btn btn-primary copy-button" onclick="copyToClipboard('appDbContext')">Copy</button>
             <code id="appDbContext">
+                
 using Microsoft.EntityFrameworkCore;
-using Perusahaan.Models;
-
 
 public class AppDbContext : DbContext
 {
@@ -64,6 +63,7 @@ public class AppDbContext : DbContext
 
     public DbSet<Pegawai> Pegawai { get; set; }
 }
+
 
             </code>
         </div>
@@ -120,149 +120,24 @@ app.Run();
         <div class="copy-box">
             <button class="btn btn-primary copy-button" onclick="copyToClipboard('controllerCode')">Copy</button>
             <code id="controllerCode">
-using Perusahaan.Models;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Threading.Tasks;
 
-namespace Perusahaan.Controllers
-{
-    public class PegawaiController : Controller
-    {
-        private readonly AppDbContext _context;
+                using Microsoft.AspNetCore.Mvc;
 
-        public PegawaiController(AppDbContext context)
-        {
-            _context = context;
-        }
+public class PegawaiController : Controller{
 
-        // Index
-        public async Task<IActionResult> Index()
-        {
-            return View(await _context.Pegawai.ToListAsync());
-        }
 
-        // Create (GET)
-        public IActionResult Create()
-        {
-            return View();
-        }
+//tambahkan AppDbContext di Controller
+private readonly AppDbContext _context;
 
-        // Create (POST)
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Nama,Bagian,Jabatan")] Pegawai pegawai)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(pegawai);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(pegawai);
-        }
+public PegawaiController(AppDbContext context){
+  _context = context;
+}
 
-        // Details
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
 
-            var pegawai = await _context.Pegawai
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (pegawai == null)
-            {
-                return NotFound();
-            }
+public IActionResult Index(){
 
-            return View(pegawai);
-        }
-
-        // Edit (GET)
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var pegawai = await _context.Pegawai.FindAsync(id);
-            if (pegawai == null)
-            {
-                return NotFound();
-            }
-            return View(pegawai);
-        }
-
-        // Edit (POST)
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Nama,Bagian,Jabatan")] Pegawai pegawai)
-        {
-            if (id != pegawai.Id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(pegawai);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!PegawaiExists(pegawai.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(pegawai);
-        }
-
-        // Delete (GET)
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var pegawai = await _context.Pegawai
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (pegawai == null)
-            {
-                return NotFound();
-            }
-
-            return View(pegawai);
-        }
-
-        // Delete (POST)
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var pegawai = await _context.Pegawai.FindAsync(id);
-            _context.Pegawai.Remove(pegawai);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool PegawaiExists(int id)
-        {
-            return _context.Pegawai.Any(e => e.Id == id);
-        }
-    }
+  var pegawai = _context.Pegawai.ToList();
+  return View(pegawai);
 }
 
             </code>
